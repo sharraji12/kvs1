@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprehensive Data Entry Website</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --background-color: #f4f4f4;
+            --card-background: #ffffff;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: var(--secondary-color);
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: var(--background-color);
+        }
+        h1, h2, h3 {
+            color: var(--secondary-color);
+            text-align: center;
+        }
+        form, .data-actions, .totals, .output-list {
+            background: var(--card-background);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        #voiceStatus {
+            margin-top: 10px;
+            font-style: italic;
+            text-align: center;
+        }
+        .tamil {
+            font-family: 'Latha', 'Arial Unicode MS', sans-serif;
+        }
+        .data-actions, .totals {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+        .advances, .persons {
+            margin-top: 10px;
+        }
+        .advance-entry, .person-entry {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 5px;
+        }
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            input, select, button {
+                font-size: 16px;
+            }
+            table {
+                font-size: 14px;
+            }
+            th, td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Comprehensive Data Entry Form</h1>
+    <form id="dataForm">
+        <div class="form-group">
+            <label for="siNo">SI No:</label>
+            <input type="number" id="siNo" name="siNo" required>
+        </div>
+        <div class="form-group">
+            <label for="date">Date:</label>
+            <input type="date" id="date" name="date" required>
+        </div>
+        <div class="form-group">
+            <label for="day">Day:</label>
+            <input type="text" id="day" name="day" readonly>
+        </div>
+        <div class="form-group">
+            <label for="cropName">Crop Name:</label>
+            <input type="text" id="cropName" name="cropName" required>
+        </div>
+        <div class="form-group">
+            <label for="village">Village:</label>
+            <input type="text" id="village" name="village" required>
+        </div>
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        <div class="form-group">
+            <label for="phoneNumber">Phone Number:</label>
+            <input type="tel" id="phoneNumber" name="phoneNumber" pattern="[6-9]\d{9}" title="Please enter a valid Indian phone number" required>
+        </div>
+        <div class="form-group">
+            <label for="noOfTrays">No. of Trays:</label>
+            <input type="number" id="noOfTrays" name="noOfTrays" required>
+        </div>
+        <div class="form-group">
+            <label for="price">Price per Tray:</label>
+            <input type="number" id="price" name="price" required>
+        </div>
+        <div class="form-group">
+            <label for="totalAmount">Total Amount:</label>
+            <input type="number" id="totalAmount" name="totalAmount" readonly>
+        </div>
+        <div class="form-group">
+            <label>Advances:</label>
+            <div id="advances">
+                <div class="advance-entry">
+                    <input type="number" placeholder="Amount" class="advance-amount" name="advanceAmount[]">
+                    <input type="date" class="advance-date" name="advanceDate[]">
+                    <button type="button" onclick="addAdvance()">+</button>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="balance">Balance:</label>
+            <input type="number" id="balance" name="balance" readonly>
+        </div>
+        <div class="form-group">
+            <label for="transplantationDay">Transplantation Day:</label>
+            <input type="text" id="transplantationDay" name="transplantationDay" readonly>
+        </div>
+        <div class="form-group">
+            <label for="status">Status:</label>
+            <select id="status" name="status">
+                <option value="pending">Pending</option>
+                <option value="completed">Completed</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="noOfPersons">Number of Persons:</label>
+            <input type="number" id="noOfPersons" name="noOfPersons" required>
+        </div>
+        <div class="form-group">
+            <label>Persons:</label>
+            <div id="persons">
+                <div class="person-entry">
+                    <input type="text" placeholder="Person Name" class="person-name" name="personName[]">
+                    <button type="button" onclick="addPerson()">+</button>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="totalCost">Total Cost:</label>
+            <input type="number" id="totalCost" name="totalCost" readonly>
+        </div>
+        <div class="form-group">
+            <label for="personSalary">Salary per Person:</label>
+            <input type="number" id="personSalary" name="personSalary" readonly>
+        </div>
+        <button type="submit">Submit</button>
+        <button type="button" id="tableFormatBtn">Table Format</button>
+        <button type="button" id="toggleVoice">Start Voice Input</button>
+        <button type="button" onclick="changeLang()">Change Language</button>
+    </form>
+
+    <div id="voiceStatus"></div>
+
+    <div class="data-actions">
+        <button onclick="downloadData()">Download Data (JSON)</button>
+        <button onclick="downloadTableAsWord()">Download Table as Word</button>
+        <input type="file" id="uploadFile" accept=".json" style="display: none;">
+        <button onclick="document.getElementById('uploadFile').click()">Upload Data (JSON)</button>
+    </div>
+
+    <h2>Data Table</h2>
+    <div class="data-actions">
+        <button onclick="filterEntries('all')">Show All</button>
+        <button onclick="filterEntries('pending')">Show Pending</button>
+        <button onclick="filterEntries('completed')">Show Completed</button>
+    </div>
+    <table id="dataTable">
+        <thead>
+            <tr>
+                <th><input type="checkbox" id="selectAll" onclick="toggleAllCheckboxes()"></th>
+                <th>SI No</th>
+                <th>Date</th>
+                <th>Day</th>
+                <th>Crop Name</th>
+                <th>Village</th>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>Trays</th>
+                <th>Price</th>
+                <th>Total</th>
+                <th>Advances</th>
+                <th>Balance</th>
+                <th>Transplantation</th>
+                <th>Status</th>
+                <th>Persons</th>
+                <th>Total Cost</th>
+                <th>Person Salary</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <div class="totals">
+        <h2>Totals</h2>
+        <button onclick="calculateTotal('totalAmount')">Total Amount</button>
+        <button onclick="calculateTotal('advance')">Total Advance</button>
+        <button onclick="calculateTotal('balance')">Total Balance</button>
+        <p id="totalResult"></p>
+    </div>
+
+    <h2>Paddy Terms Report</h2>
+    <form id="paddyTermForm">
+        <div class="form-group">
+            <label for="year">Year:</label>
+            <input type="number" id="year" required>
+        </div>
+        <div class="form-group">
+            <label for="noOfTerms">Number of Paddy Terms:</label>
+            <input type="number" id="noOfTerms" required>
+        </div>
+        <button type="submit">Add Paddy Term Report</button>
+    </form>
+
+    <table id="paddyTermTable">
+        <thead>
+            <tr>
+                <th>Year</th>
+                <th>Number of Paddy Terms</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        let entries = [];
+        let paddyTerms = [];
+        let currentLang = 'en-US';
+        let recognition;
+        let editingIndex = -1;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDataFromStorage();
+            updateTable();
+            updatePaddyTermTable();
+        });
+
+        document.getElementById('date').addEventListener('change', updateDateInfo);
+        document.getElementById('noOfTrays').addEventListener('input', calculateTotalAmount);
+        document.getElementById('price').addEventListener('input', calculateTotalAmount);
+        document.getElementById('noOfPersons').addEventListener('input', calculatePersonSalary);
+        document.getElementById('dataForm').addEventListener('submit', handleSubmit);
+        document.getElementById('toggleVoice').addEventListener('click', toggleVoiceInput);
+        document.getElementById('uploadFile').addEventListener('change', uploadData);
+        document.getElementById('paddyTermForm').addEventListener('submit', handlePaddyTermSubmit);
+        document.getElementById('tableFormatBtn').addEventListener('click', toggleTableFormat);
+
+        function loadDataFromStorage() {
+            const storedData = localStorage.getItem('entryData');
+            const storedPaddyTerms = localStorage.getItem('paddyTerms');
+            if (storedData) {
+                entries = JSON.parse(storedData);
+            }
+            if (storedPaddyTerms) {
+                paddyTerms = JSON.parse(storedPaddyTerms);
+            }
+        }
+
+        function saveDataToStorage() {
+            localStorage.setItem('entryData', JSON.stringify(entries));
+            localStorage.setItem('paddyTerms', JSON.stringify(paddyTerms));
+        }
+
+        function updateDateInfo() {
+            const date = new Date(this.value);
+            const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            document.getElementById('day').value = days[date.getDay()];
+            
+            const firstDay = new Date(date);
+            firstDay.setDate(date.getDate() + 18);
+            const secondDay = new Date(date);
+            secondDay.setDate(date.getDate() + 20);
+            document.getElementById('transplantationDay').value = `1st: ${firstDay.toDateString()}, 2nd: ${secondDay.toDateString()}`;
+        }
+
+        function calculateTotalAmount() {
+            const noOfTrays = parseFloat(document.getElementById('noOfTrays').value) || 0;
+            const price = parseFloat(document.getElementById('price').value) || 0;
+            const totalAmount = noOfTrays * price;
+            document.getElementById('totalAmount').value = totalAmount.toFixed(2);
+            calculateBalance();
+            calculateTotalCost();
+        }
+
+        function calculateBalance() {
+            const totalAmount = parseFloat(document.getElementById('totalAmount').value) || 0;
+            const advances = Array.from(document.querySelectorAll('.advance-amount'))
+                .reduce((sum, input) => sum + (parseFloat(input.value) || 0), 0);
+            document.getElementById('balance').value = (totalAmount - advances).toFixed(2);
+        }
+
+        function calculateTotalCost() {
+            const noOfTrays = parseFloat(document.getElementById('noOfTrays').value) || 0;
+            const totalCost = noOfTrays * 2;
+            document.getElementById('totalCost').value = totalCost.toFixed(2);
+            calculatePersonSalary();
+        }
+
+        function calculatePersonSalary() {
+            const totalCost = parseFloat(document.getElementById('totalCost').value) || 0;
+            const noOfPersons = parseFloat(document.getElementById('noOfPersons').value) || 1;
+            const personSalary = totalCost / noOfPersons;
+            document.getElementById('personSalary').value = personSalary.toFixed(2);
+        }
+
+        function addAdvance() {
+            const advancesDiv = document.getElementById('advances');
+            const newAdvance = document.createElement('div');
+            newAdvance.className = 'advance-entry';
+            newAdvance.innerHTML = `
+                <input type="number" placeholder="Amount" class="advance-amount" name="advanceAmount[]">
+                <input type="date" class="advance-date" name="advanceDate[]">
+                <button type="button" onclick="removeAdvance(this)">-</button>
+            `;
+            advancesDiv.appendChild(newAdvance);
+            calculateBalance();
+        }
+
+        function removeAdvance(button) {
+            button.parentElement.remove();
+            calculateBalance();
+        }
+
+        function addPerson() {
+            const personsDiv = document.getElementById('persons');
+            const newPerson = document.createElement('div');
+            newPerson.className = 'person-entry';
+            newPerson.innerHTML = `
+                <input type="text" placeholder="Person Name" class="person-name" name="personName[]">
+                <button type="button" onclick="removePerson(this)">-</button>
+            `;
+            personsDiv.appendChild(newPerson);
+        }
+
+        function removePerson(button) {
+            button.parentElement.remove();
+        }
+
+        function handleSubmit(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const entry = Object.fromEntries(formData.entries());
+            
+            // Handle advances
+            entry.advances = Array.from(document.querySelectorAll('.advance-entry')).map(div => ({
+                amount: div.querySelector('.advance-amount').value,
+                date: div.querySelector('.advance-date').value
+            }));
+
+            // Handle persons
+            entry.persons = Array.from(document.querySelectorAll('.person-name')).map(input => input.value);
+
+            if (editingIndex === -1) {
+                entries.push(entry);
+            } else {
+                entries[editingIndex] = entry;
+                editingIndex = -1;
+            }
+
+            updateTable();
+            saveDataToStorage();
+            e.target.reset();
+            document.getElementById('advances').innerHTML = `
+                <div class="advance-entry">
+                    <input type="number" placeholder="Amount" class="advance-amount" name="advanceAmount[]">
+                    <input type="date" class="advance-date" name="advanceDate[]">
+                    <button type="button" onclick="addAdvance()">+</button>
+                </div>
+            `;
+            document.getElementById('persons').innerHTML = `
+                <div class="person-entry">
+                    <input type="text" placeholder="Person Name" class="person-name" name="personName[]">
+                    <button type="button" onclick="addPerson()">+</button>
+                </div>
+            `;
+            document.getElementById('siNo').focus();
+        }
+
+        function updateTable() {
+            const tbody = document.querySelector('#dataTable tbody');
+            tbody.innerHTML = '';
+            entries.forEach((entry, index) => {
+                const tr = document.createElement('tr');
+                
+                // Add checkbox
+                const checkboxTd = document.createElement('td');
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.className = 'row-checkbox';
+                checkboxTd.appendChild(checkbox);
+                tr.appendChild(checkboxTd);
+
+                // Add data in the correct order
+                const fields = ['siNo', 'date', 'day', 'cropName', 'village', 'name', 'phoneNumber', 
+                                'noOfTrays', 'price', 'totalAmount', 'balance', 'transplantationDay', 
+                                'status', 'totalCost', 'personSalary'];
+                
+                fields.forEach(field => {
+                    const td = document.createElement('td');
+                    td.textContent = entry[field] || '';
+                    tr.appendChild(td);
+                });
+
+                // Handle advances
+                const advancesTd = document.createElement('td');
+                advancesTd.textContent = entry.advances.map(adv => `${adv.amount} (${adv.date})`).join(', ');
+                tr.insertBefore(advancesTd, tr.children[11]); // Insert after totalAmount
+
+                // Handle persons
+                const personsTd = document.createElement('td');
+                personsTd.textContent = entry.persons.join(', ');
+                tr.insertBefore(personsTd, tr.children[15]); // Insert after status
+
+                // Add action buttons
+                const actionsTd = document.createElement('td');
+                const editButton = document.createElement('button');
+                editButton.textContent = 'Edit';
+                editButton.onclick = () => editEntry(index);
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete';
+                deleteButton.onclick = () => deleteEntry(index);
+                actionsTd.appendChild(editButton);
+                actionsTd.appendChild(deleteButton);
+                tr.appendChild(actionsTd);
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        function toggleTableFormat() {
+            const table = document.getElementById('dataTable');
+            table.style.display = table.style.display === 'none' ? 'table' : 'none';
+        }
+
+        function editEntry(index) {
+            const entry = entries[index];
+            document.getElementById('siNo').value = entry.siNo;
+            document.getElementById('date').value = entry.date;
+            document.getElementById('day').value = entry.day;
+            document.getElementById('cropName').value = entry.cropName;
+            document.getElementById('village').value = entry.village;
+            document.getElementById('name').value = entry.name;
+            document.getElementById('phoneNumber').value = entry.phoneNumber;
+            document.getElementById('noOfTrays').value = entry.noOfTrays;
+            document.getElementById('price').value = entry.price;
+            document.getElementById('totalAmount').value = entry.totalAmount;
+            document.getElementById('balance').value = entry.balance;
+            document.getElementById('transplantationDay').value = entry.transplantationDay;
+            document.getElementById('status').value = entry.status;
+            document.getElementById('noOfPersons').value = entry.noOfPersons;
+            document.getElementById('totalCost').value = entry.totalCost;
+            document.getElementById('personSalary').value = entry.personSalary;
+
+            // Handle advances
+            const advancesDiv = document.getElementById('advances');
+            advancesDiv.innerHTML = '';
+            entry.advances.forEach(adv => {
+                const advanceEntry = document.createElement('div');
+                advanceEntry.className = 'advance-entry';
+                advanceEntry.innerHTML = `
+                    <input type="number" placeholder="Amount" class="advance-amount" name="advanceAmount[]" value="${adv.amount}">
+                    <input type="date" class="advance-date" name="advanceDate[]" value="${adv.date}">
+                    <button type="button" onclick="removeAdvance(this)">-</button>
+                `;
+                advancesDiv.appendChild(advanceEntry);
+            });
+
+            // Handle persons
+            const personsDiv = document.getElementById('persons');
+            personsDiv.innerHTML = '';
+            entry.persons.forEach(person => {
+                const personEntry = document.createElement('div');
+                personEntry.className = 'person-entry';
+                personEntry.innerHTML = `
+                    <input type="text" placeholder="Person Name" class="person-name" name="personName[]" value="${person}">
+                    <button type="button" onclick="removePerson(this)">-</button>
+                `;
+                personsDiv.appendChild(personEntry);
+            });
+
+            editingIndex = index;
+        }
+
+        function deleteEntry(index) {
+            if (confirm('Are you sure you want to delete this entry?')) {
+                entries.splice(index, 1);
+                updateTable();
+                saveDataToStorage();
+            }
+        }
+
+        function filterEntries(status) {
+            const tbody = document.querySelector('#dataTable tbody');
+            tbody.innerHTML = '';
+            entries.filter(entry => status === 'all' || entry.status === status).forEach((entry, index) => {
+                const tr = document.createElement('tr');
+                
+                // Add checkbox
+                const checkboxTd = document.createElement('td');
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.className = 'row-checkbox';
+                checkboxTd.appendChild(checkbox);
+                tr.appendChild(checkboxTd);
+
+                // Add data in the correct order
+                const fields = ['siNo', 'date', 'day', 'cropName', 'village', 'name', 'phoneNumber', 
+                                'noOfTrays', 'price', 'totalAmount', 'balance', 'transplantationDay', 
+                                'status', 'totalCost', 'personSalary'];
+                
+                fields.forEach(field => {
+                    const td = document.createElement('td');
+                    td.textContent = entry[field] || '';
+                    tr.appendChild(td);
+                });
+
+                // Handle advances
+                const advancesTd = document.createElement('td');
+                advancesTd.textContent = entry.advances.map(adv => `${adv.amount} (${adv.date})`).join(', ');
+                tr.insertBefore(advancesTd, tr.children[11]); // Insert after totalAmount
+
+                // Handle persons
+                const personsTd = document.createElement('td');
+                personsTd.textContent = entry.persons.join(', ');
+                tr.insertBefore(personsTd, tr.children[15]); // Insert after status
+
+                // Add action buttons
+                const actionsTd = document.createElement('td');
+                const editButton = document.createElement('button');
+                editButton.textContent = 'Edit';
+                editButton.onclick = () => editEntry(index);
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete';
+                deleteButton.onclick = () => deleteEntry(index);
+                actionsTd.appendChild(editButton);
+                actionsTd.appendChild(deleteButton);
+                tr.appendChild(actionsTd);
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        function calculateTotal(field) {
+            const checkedRows = document.querySelectorAll('.row-checkbox:checked');
+            let total = 0;
+
+            checkedRows.forEach(checkbox => {
+                const row = checkbox.closest('tr');
+                if (field === 'advance') {
+                    const advancesText = row.children[11].textContent;
+                    const advances = advancesText.split(', ').map(adv => parseFloat(adv.split(' ')[0]));
+                    total += advances.reduce((sum, adv) => sum + adv, 0);
+                } else {
+                    const cellIndex = field === 'totalAmount' ? 10 : (field === 'balance' ? 12 : -1);
+                    if (cellIndex !== -1) {
+                        total += parseFloat(row.children[cellIndex].textContent) || 0;
+                    }
+                }
+            });
+
+            document.getElementById('totalResult').textContent = `Total ${field}: ${total.toFixed(2)}`;
+        }
+
+        function toggleVoiceInput() {
+            if (recognition && recognition.running) {
+                recognition.stop();
+                document.getElementById('toggleVoice').textContent = 'Start Voice Input';
+                document.getElementById('voiceStatus').textContent = 'Voice input stopped';
+            } else {
+                startSpeechRecognition();
+                document.getElementById('toggleVoice').textContent = 'Stop Voice Input';
+                document.getElementById('voiceStatus').textContent = 'Listening...';
+            }
+        }
+
+        function startSpeechRecognition() {
+            if ('webkitSpeechRecognition' in window) {
+                recognition = new webkitSpeechRecognition();
+                recognition.continuous = true;
+                recognition.interimResults = true;
+                recognition.lang = currentLang;
+
+                recognition.onresult = function(event) {
+                    const result = event.results[event.results.length - 1];
+                    if (result.isFinal) {
+                        const activeElement = document.activeElement;
+                        if (activeElement && activeElement.tagName === 'INPUT') {
+                            activeElement.value = result[0].transcript;
+                            activeElement.dispatchEvent(new Event('input'));
+                        }
+                    }
+                };
+
+                recognition.onend = function() {
+                    if (document.getElementById('toggleVoice').textContent === 'Stop Voice Input') {
+                        recognition.start();
+                    }
+                };
+
+                recognition.start();
+            } else {
+                alert('Speech recognition is not supported in this browser.');
+            }
+        }
+
+        function changeLang() {
+            currentLang = currentLang === 'en-US' ? 'ta-IN' : 'en-US';
+            document.body.classList.toggle('tamil');
+            if (recognition) {
+                recognition.lang = currentLang;
+                recognition.stop();
+                recognition.start();
+            }
+            alert(`Language changed to ${currentLang === 'en-US' ? 'English' : 'Tamil'}`);
+        }
+
+        function downloadData() {
+            const dataStr = JSON.stringify(entries, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            const exportFileDefaultName = 'data.json';
+
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+        }
+
+        function uploadData(event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const uploadedData = JSON.parse(e.target.result);
+                    entries = uploadedData;
+                    saveDataToStorage();
+                    updateTable();
+                    alert('Data uploaded and saved successfully!');
+                } catch (error) {
+                    alert('Error parsing JSON file. Please make sure it\'s a valid JSON file.');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function handlePaddyTermSubmit(e) {
+            e.preventDefault();
+            const year = document.getElementById('year').value;
+            const noOfTerms = document.getElementById('noOfTerms').value;
+            paddyTerms.push({ year, noOfTerms });
+            updatePaddyTermTable();
+            saveDataToStorage();
+            e.target.reset();
+        }
+
+        function updatePaddyTermTable() {
+            const tbody = document.querySelector('#paddyTermTable tbody');
+            tbody.innerHTML = '';
+            paddyTerms.forEach(term => {
+                const tr = document.createElement('tr');
+                const yearTd = document.createElement('td');
+                yearTd.textContent = term.year;
+                const termsTd = document.createElement('td');
+                termsTd.textContent = term.noOfTerms;
+                tr.appendChild(yearTd);
+                tr.appendChild(termsTd);
+                tbody.appendChild(tr);
+            });
+        }
+
+        function toggleAllCheckboxes() {
+            const checkboxes = document.querySelectorAll('.row-checkbox');
+            const selectAllCheckbox = document.getElementById('selectAll');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAllCheckbox.checked;
+            });
+        }
+
+        function downloadTableAsWord() {
+            const table = document.getElementById('dataTable');
+            const checkedRows = table.querySelectorAll('.row-checkbox:checked');
+            
+            if (checkedRows.length === 0) {
+                alert('Please select at least one row to download.');
+                return;
+            }
+
+            let content = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">';
+            content += '<head><meta charset="utf-8"><title>Export HTML to Word Document with JavaScript</title></head><body>';
+            content += '<table border="1">';
+            content += table.querySelector('thead').outerHTML;
+            content += '<tbody>';
+
+            checkedRows.forEach(checkbox => {
+                content += checkbox.closest('tr').outerHTML;
+            });
+
+            content += '</tbody></table>';
+            content += '</body></html>';
+
+            const blob = new Blob([content], { type: 'application/msword' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'table_data.doc';
+            link.click();
+            URL.revokeObjectURL(link.href);
+        }
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDataFromStorage();
+            updateTable();
+            updatePaddyTermTable();
+        });
+    </script>
+</body>
+</html>
